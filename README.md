@@ -1,6 +1,6 @@
 # Invoice Form Demo
 ## Intro
-This is just a simple demo form to showcase the use of JavaScript in a statice webpage setting. 
+This is just a simple demo form to showcase the use of JavaScript in a static webpage setting. 
 
 ## Feature
 You can fill up the form, calculate and try printing out the form using your browser printing function.

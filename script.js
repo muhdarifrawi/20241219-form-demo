@@ -14,10 +14,16 @@ let bananaCost = 3.50;
 let cherryCost = 4.50;
 
 let form = document.querySelector("form");
-form.addEventListener("submit", function (event) {
-  event.preventDefault();
 
-  let salutation = "";
+function checkSalutation() {
+  for (each of salutations) {
+    if (each.checked) {
+      return each.value.toUpperCase();
+    }
+  }
+}
+
+function calculateCosts() {
   let itemCosts = 0;
 
   let appleTotal = 0;
@@ -27,14 +33,6 @@ form.addEventListener("submit", function (event) {
   let appleChecked = false;
   let bananaChecked = false;
   let cherryChecked = false;
-
-  for (each of salutations) {
-    if (each.checked) {
-      salutation = each.value.toUpperCase();
-    }
-  }
-
-  let outputName = `${salutation} ${username.value.toUpperCase()}`;
 
   for (each of items) {
     if (each.checked) {
@@ -55,7 +53,10 @@ form.addEventListener("submit", function (event) {
       }
     }
   }
+  return [itemCosts, appleTotal, bananaTotal, cherryTotal, appleChecked, bananaChecked, cherryChecked];
+}
 
+function applyDiscounts(itemCosts) {
   let gstDiscount = 0.09;
   let loyaltyDiscount = 0.05;
 
@@ -87,7 +88,20 @@ form.addEventListener("submit", function (event) {
 
   }
 
-  console.log("item costs:", itemCosts);
+  return [itemCosts, discountsTable];
+}
+
+form.addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  let salutation = checkSalutation();
+  // NOTE: This is called array destructuring
+  [itemCosts, appleTotal, bananaTotal, cherryTotal, appleChecked, bananaChecked, cherryChecked] = calculateCosts();
+
+
+  let outputName = `${salutation} ${username.value.toUpperCase()}`;
+
+  [itemCosts, discountsTable] = applyDiscounts(itemCosts);
 
   let invoiceOutput = `
     <h1>Invoice</h1>
@@ -103,35 +117,35 @@ form.addEventListener("submit", function (event) {
         </tr>
       </thead>
       <tbody>
-      ${parseFloat(appleQty.value) && appleChecked > 0 ? 
-        `<tr>
+      ${parseFloat(appleQty.value) && appleChecked > 0 ?
+      `<tr>
           <th scope="row">1</th>
           <td>Apple</td>
           <td>${appleQty.value}</td>
           <td>${appleCost}</td>
           <td>${appleTotal}</td>
         </tr>`: ""
-      }
+    }
 
-      ${parseFloat(bananaQty.value) && bananaChecked > 0 ? 
-        `<tr>
+      ${parseFloat(bananaQty.value) && bananaChecked > 0 ?
+      `<tr>
           <th scope="row">2</th>
           <td>Banana</td>
           <td>${bananaQty.value}</td>
           <td>${bananaCost}</td>
           <td>${bananaTotal}</td>
         </tr>`: ""
-      }
+    }
 
-      ${parseFloat(cherryQty.value) && cherryChecked > 0 ? 
-        `<tr>
+      ${parseFloat(cherryQty.value) && cherryChecked > 0 ?
+      `<tr>
           <th scope="row">3</th>
           <td>Cherry</td>
           <td>${cherryQty.value}</td>
           <td>${cherryCost}</td>
           <td>${cherryTotal}</td>
         </tr>`: ""
-      }
+    }
         
       ${discountsTable ? discountsTable : ""} 
         
@@ -144,11 +158,11 @@ form.addEventListener("submit", function (event) {
         </tr>
       </tbody>
     </table>
-    ${comment.value ? 
+    ${comment.value ?
       `<h2>Remarks</h2>
-    <p>${comment.value}</p>`: ""
+    <p>${comment.value}</p>` : ""
     }
     `
 
-    formOutput.innerHTML = invoiceOutput;
+  formOutput.innerHTML = invoiceOutput;
 });
