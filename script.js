@@ -24,6 +24,10 @@ form.addEventListener("submit", function (event) {
   let bananaTotal = 0;
   let cherryTotal = 0;
 
+  let appleChecked = false;
+  let bananaChecked = false;
+  let cherryChecked = false;
+
   for (each of salutations) {
     if (each.checked) {
       salutation = each.value.toUpperCase();
@@ -35,14 +39,17 @@ form.addEventListener("submit", function (event) {
   for (each of items) {
     if (each.checked) {
       if (each.value == "apple") {
+        appleChecked = true;
         appleTotal = appleCost * parseFloat(appleQty.value);
         itemCosts += appleTotal;
       }
       if (each.value == "banana") {
+        bananaChecked = true;
         bananaTotal = bananaCost * parseFloat(bananaQty.value);
         itemCosts += bananaTotal;
       }
       if (each.value == "cherry") {
+        cherryChecked = true;
         cherryTotal = cherryCost * parseFloat(cherryQty.value);
         itemCosts += cherryTotal;
       }
@@ -52,21 +59,35 @@ form.addEventListener("submit", function (event) {
   let gstDiscount = 0.09;
   let loyaltyDiscount = 0.05;
 
+  let discountsTable = ``;
+
   for (each of discounts) {
     if (each.checked) {
       if (each.value == "gst-discount") {
         itemCosts = itemCosts - (itemCosts * gstDiscount);
+        discountsTable += `<tr>
+          <th scope="row"></th>
+          <td></td>
+          <td></td>
+          <td>GST Discount</td>
+          <td>${gstDiscount * 100}%</td>
+        </tr>`;
       }
       if (each.value == "loyalty-discount") {
         itemCosts = itemCosts - (itemCosts * loyaltyDiscount);
+        discountsTable += `<tr>
+          <th scope="row"></th>
+          <td></td>
+          <td></td>
+          <td>Loyalty Discount</td>
+          <td>${loyaltyDiscount * 100}%</td>
+        </tr>`;
       }
     }
 
   }
 
   console.log("item costs:", itemCosts);
-
-
 
   let invoiceOutput = `
     <h1>Invoice</h1>
@@ -82,41 +103,38 @@ form.addEventListener("submit", function (event) {
         </tr>
       </thead>
       <tbody>
-        <tr>
+      ${parseFloat(appleQty.value) && appleChecked > 0 ? 
+        `<tr>
           <th scope="row">1</th>
           <td>Apple</td>
           <td>${appleQty.value}</td>
           <td>${appleCost}</td>
           <td>${appleTotal}</td>
-        </tr>
-        <tr>
+        </tr>`: ""
+      }
+
+      ${parseFloat(bananaQty.value) && bananaChecked > 0 ? 
+        `<tr>
           <th scope="row">2</th>
           <td>Banana</td>
           <td>${bananaQty.value}</td>
           <td>${bananaCost}</td>
           <td>${bananaTotal}</td>
-        </tr>
-        <tr>
+        </tr>`: ""
+      }
+
+      ${parseFloat(cherryQty.value) && cherryChecked > 0 ? 
+        `<tr>
           <th scope="row">3</th>
           <td>Cherry</td>
           <td>${cherryQty.value}</td>
           <td>${cherryCost}</td>
           <td>${cherryTotal}</td>
-        </tr>
-        <tr>
-          <th scope="row"></th>
-          <td></td>
-          <td></td>
-          <td>Loyalty Discount</td>
-          <td>${loyaltyDiscount * 100}%</td>
-        </tr>
-        <tr>
-          <th scope="row"></th>
-          <td></td>
-          <td></td>
-          <td>GST Discount</td>
-          <td>${gstDiscount * 100}%</td>
-        </tr>
+        </tr>`: ""
+      }
+        
+      ${discountsTable ? discountsTable : ""} 
+        
         <tr>
           <th scope="row"></th>
           <td></td>
@@ -126,9 +144,11 @@ form.addEventListener("submit", function (event) {
         </tr>
       </tbody>
     </table>
-    <h2>Remarks</h2>
-    <p>${comment.value}</p>
+    ${comment.value ? 
+      `<h2>Remarks</h2>
+    <p>${comment.value}</p>`: ""
+    }
     `
 
-  formOutput.innerHTML += invoiceOutput;
+    formOutput.innerHTML = invoiceOutput;
 });
